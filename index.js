@@ -1,0 +1,55 @@
+const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
+const express = require('express');
+const multer = require('multer');
+const { Blockchain } = require('./blockchain');
+const { Block } = require('./block');
+const viewRoutes = require('./routes/viewRoutes');
+const blockchainRoutes = require('./routes/blockchainRoutes');
+
+// App setup
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'templates')));
+
+// Garantir diretório de uploads
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Multer config para salvar arquivos enviados
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadsDir);
+  },
+  filename: function (req, file, cb) {
+    // manter nome original com timestamp para evitar colisões
+    const timestamp = Date.now();
+    const safeName = file.originalname.replace(/[^a-zA-Z0-9_.-]/g, '_');
+    cb(null, `${timestamp}__${safeName}`);
+  }
+});
+const upload = multer({ storage });
+
+// Blockchain instance
+const blockchain = new Blockchain();
+
+// Ajustar index do bloco para continuar a partir do tamanho atual da cadeia
+try {
+  if (Array.isArray(blockchain.chain)) {
+    Block.indexCount = blockchain.chain.length;
+  }
+} catch {}
+
+viewRoutes(app);
+// injeta dependências necessárias nas rotas da blockchain
+blockchainRoutes(app, { upload, blockchain });
+
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
+

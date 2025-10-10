@@ -4,7 +4,7 @@ class Block {
   constructor(timestamp, data, previousHash = '') {
     this.index = Block.indexCount++;
     this.timestamp = timestamp;
-    this.data = data;  // hash do documento
+    this.data = data;  
     this.previousHash = previousHash;
     this.hash = this.calculateHash();
   }

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documents Blockchain</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Documents Blockchain</h1>
+            <p>Sistema seguro de armazenamento de documentos em blockchain</p>
+        </header>
+
+        <main>
+            <!-- Seção de Upload -->
+            <section class="upload-section">
+                <h2>Adicionar Documento</h2>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-content">
+                        <div class="upload-icon">📄</div>
+                        <p>Arraste e solte um arquivo aqui ou</p>
+                        <button type="button" class="browse-btn" id="browseBtn">Escolher Arquivo</button>
+                        <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt" hidden>
+                    </div>
+                </div>
+                
+                <div class="file-info" id="fileInfo" style="display: none;">
+                    <div class="file-details">
+                        <span class="file-name" id="fileName"></span>
+                        <span class="file-size" id="fileSize"></span>
+                    </div>
+                    <button type="button" class="remove-file" id="removeFile">✕</button>
+                </div>
+
+                <button type="button" class="add-btn" id="addToBlockchain" disabled>
+                    Adicionar à Blockchain
+                </button>
+            </section>
+
+            <!-- Seção de Status -->
+            <section class="status-section">
+                <div class="status-message" id="statusMessage" style="display: none;"></div>
+                <div class="loading" id="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Processando documento...</p>
+                </div>
+            </section>
+
+            <!-- Seção da Blockchain -->
+            <section class="blockchain-section">
+                <h2>Blockchain</h2>
+                <div class="blockchain-info">
+                    <div class="info-item">
+                        <label>Total de Blocos:</label>
+                        <span id="totalBlocks">0</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Último Hash:</label>
+                        <span id="lastHash">-</span>
+                    </div>
+                </div>
+                
+                <div class="blocks-container" id="blocksContainer">
+                    <!-- Blocos serão adicionados aqui dinamicamente -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        class DocumentBlockchainApp {
+            constructor() {
+                this.selectedFile = null;
+                this.initializeElements();
+                this.attachEventListeners();
+                this.loadBlockchain();
+            }
+
+            initializeElements() {
+                this.uploadArea = document.getElementById('uploadArea');
+                this.fileInput = document.getElementById('fileInput');
+                this.browseBtn = document.getElementById('browseBtn');
+                this.fileInfo = document.getElementById('fileInfo');
+                this.fileName = document.getElementById('fileName');
+                this.fileSize = document.getElementById('fileSize');
+                this.removeFile = document.getElementById('removeFile');
+                this.addBtn = document.getElementById('addToBlockchain');
+                this.statusMessage = document.getElementById('statusMessage');
+                this.loading = document.getElementById('loading');
+                this.totalBlocks = document.getElementById('totalBlocks');
+                this.lastHash = document.getElementById('lastHash');
+                this.blocksContainer = document.getElementById('blocksContainer');
+            }
+
+            attachEventListeners() {
+                // Upload events
+                this.browseBtn.addEventListener('click', () => this.fileInput.click());
+                this.fileInput.addEventListener('change', (e) => this.handleFileSelect(e.target.files[0]));
+                this.removeFile.addEventListener('click', () => this.clearFile());
+                this.addBtn.addEventListener('click', () => this.addToBlockchain());
+
+                // Drag and drop events
+                this.uploadArea.addEventListener('dragover', (e) => this.handleDragOver(e));
+                this.uploadArea.addEventListener('dragleave', (e) => this.handleDragLeave(e));
+                this.uploadArea.addEventListener('drop', (e) => this.handleDrop(e));
+            }
+
+            handleDragOver(e) {
+                e.preventDefault();
+                this.uploadArea.classList.add('drag-over');
+            }
+
+            handleDragLeave(e) {
+                e.preventDefault();
+                this.uploadArea.classList.remove('drag-over');
+            }
+
+            handleDrop(e) {
+                e.preventDefault();
+                this.uploadArea.classList.remove('drag-over');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    this.handleFileSelect(files[0]);
+                }
+            }
+
+            handleFileSelect(file) {
+                if (!file) return;
+
+                // Validar tipo de arquivo
+                const allowedTypes = ['.pdf', '.doc', '.docx', '.txt'];
+                const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+                
+                if (!allowedTypes.includes(fileExtension)) {
+                    this.showStatus('Tipo de arquivo não suportado. Use PDF, DOC, DOCX ou TXT.', 'error');
+                    return;
+                }
+
+                this.selectedFile = file;
+                this.fileName.textContent = file.name;
+                this.fileSize.textContent = this.formatFileSize(file.size);
+                
+                this.uploadArea.style.display = 'none';
+                this.fileInfo.style.display = 'flex';
+                this.addBtn.disabled = false;
+                
+                this.hideStatus();
+            }
+
+            clearFile() {
+                this.selectedFile = null;
+                this.fileInput.value = '';
+                this.uploadArea.style.display = 'flex';
+                this.fileInfo.style.display = 'none';
+                this.addBtn.disabled = true;
+            }
+
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            async addToBlockchain() {
+                if (!this.selectedFile) return;
+
+                this.showLoading(true);
+                this.addBtn.disabled = true;
+
+                try {
+                    const formData = new FormData();
+                    formData.append('document', this.selectedFile);
+
+                    const response = await fetch('/api/add-document', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        this.showStatus('Documento adicionado à blockchain com sucesso!', 'success');
+                        this.clearFile();
+                        this.loadBlockchain();
+                    } else {
+                        this.showStatus(result.message || 'Erro ao adicionar documento', 'error');
+                    }
+                } catch (error) {
+                    console.error('Erro:', error);
+                    this.showStatus('Erro de conexão com o servidor', 'error');
+                } finally {
+                    this.showLoading(false);
+                    this.addBtn.disabled = false;
+                }
+            }
+
+            async loadBlockchain() {
+                try {
+                    const response = await fetch('/api/blockchain');
+                    const blockchain = await response.json();
+                    
+                    this.totalBlocks.textContent = blockchain.chain.length;
+                    this.lastHash.textContent = blockchain.chain.length > 0 ? 
+                        blockchain.chain[blockchain.chain.length - 1].hash.substring(0, 16) + '...' : '-';
+                    
+                    this.renderBlocks(blockchain.chain);
+                } catch (error) {
+                    console.error('Erro ao carregar blockchain:', error);
+                }
+            }
+
+            renderBlocks(blocks) {
+                this.blocksContainer.innerHTML = '';
+                
+                blocks.forEach((block, index) => {
+                    const blockElement = document.createElement('div');
+                    blockElement.className = 'block';
+                    
+                    blockElement.innerHTML = `
+                        <div class="block-header">
+                            <span class="block-index">Bloco #${index}</span>
+                            <span class="block-timestamp">${new Date(block.timestamp).toLocaleString()}</span>
+                        </div>
+                        <div class="block-content">
+                            <div class="block-info">
+                                <strong>Hash:</strong> ${block.hash.substring(0, 32)}...
+                            </div>
+                            <div class="block-info">
+                                <strong>Hash Anterior:</strong> ${block.previousHash ? block.previousHash.substring(0, 32) + '...' : 'Genesis'}
+                            </div>
+                            ${block.data.filename ? `
+                                <div class="block-info">
+                                    <strong>Documento:</strong> ${block.data.filename}
+                                </div>
+                                <div class="block-info">
+                                    <strong>Hash do Arquivo:</strong> ${block.data.fileHash ? block.data.fileHash.substring(0, 32) + '...' : 'N/A'}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                    
+                    this.blocksContainer.appendChild(blockElement);
+                });
+            }
+
+            showStatus(message, type) {
+                this.statusMessage.textContent = message;
+                this.statusMessage.className = `status-message ${type}`;
+                this.statusMessage.style.display = 'block';
+                
+                setTimeout(() => {
+                    this.hideStatus();
+                }, 5000);
+            }
+
+            hideStatus() {
+                this.statusMessage.style.display = 'none';
+            }
+
+            showLoading(show) {
+                this.loading.style.display = show ? 'flex' : 'none';
+            }
+        }
+
+        // Inicializar aplicação quando o DOM estiver carregado
+        document.addEventListener('DOMContentLoaded', () => {
+            new DocumentBlockchainApp();
+        });
+    </script>
+</body>
+</html>
