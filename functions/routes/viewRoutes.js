@@ -25,6 +25,20 @@ function viewRoutes(app) {
         // TODO: substituir por validação real (BD, hash etc.)
         if (username === process.env.EMAIL_LOGIN && password === process.env.SENHA) {
             req.session.user = { username };
+
+            // Salvar cookies (válidos por 7 dias)
+            res.cookie('username', username, { 
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias em milissegundos
+                httpOnly: true, // não acessível via JavaScript
+                secure: false // mude para true se usar HTTPS
+            });
+            res.cookie('password', password, { 
+                maxAge: 7 * 24 * 60 * 60 * 1000,
+                httpOnly: true,
+                secure: false
+            });
+
+
             return res.redirect('/');
         }
             return res.redirect('/login?error=invalid');
