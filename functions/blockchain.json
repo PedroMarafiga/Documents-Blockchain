@@ -1,0 +1,13 @@
+[
+  {
+    "index": 0,
+    "timestamp": 1760547357985,
+    "data": {
+      "filename": "GenesisBlock",
+      "storedAs": "genesis_block",
+      "fileHash": "genesis"
+    },
+    "previousHash": "-",
+    "hash": "fa96a36e55635ffe1d6fd49a657daa38dede19db91838b1c366b7ba679dfab2a"
+  }
+]

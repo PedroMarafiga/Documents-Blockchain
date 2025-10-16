@@ -6,7 +6,7 @@ class Blockchain {
   }
 
   createGenesisBlock() {
-    return new Block(Date.now(), "Genesis Block", "0");
+    return new Block(Date.now(), {"filename": "GenesisBlock","storedAs": "genesis_block","fileHash":"genesis"}, "-");
   }
 
   loadOrCreateChain() {

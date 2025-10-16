@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const express = require('express');
+const session = require('express-session');
 const multer = require('multer');
 const { Blockchain } = require('./blockchain');
 const { Block } = require('./block');
@@ -12,8 +13,15 @@ const blockchainRoutes = require('./routes/blockchainRoutes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'templates')));
+
+app.use(session({
+  secret: 'teste',
+  resave: false,
+  saveUninitialized: false,
+}));
 
 // Garantir diretório de uploads
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -50,6 +58,6 @@ viewRoutes(app);
 blockchainRoutes(app, { upload, blockchain });
 
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+  console.log(`Servidor rodando na porta http://localhost:${PORT}/`);
 });
 

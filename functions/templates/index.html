@@ -227,17 +227,17 @@
                         </div>
                         <div class="block-content">
                             <div class="block-info">
-                                <strong>Hash:</strong> ${block.hash.substring(0, 32)}...
+                                <strong>Hash:</strong> ${block.hash.substring(0, 72)}
                             </div>
                             <div class="block-info">
-                                <strong>Hash Anterior:</strong> ${block.previousHash ? block.previousHash.substring(0, 32) + '...' : 'Genesis'}
+                                <strong>Hash Anterior:</strong> ${block.previousHash.length < 70 ? block.previousHash : block.previousHash.substring(0, 67) + '...' }
                             </div>
                             ${block.data.filename ? `
                                 <div class="block-info">
                                     <strong>Documento:</strong> ${block.data.filename}
                                 </div>
                                 <div class="block-info">
-                                    <strong>Hash do Arquivo:</strong> ${block.data.fileHash ? block.data.fileHash.substring(0, 32) + '...' : 'N/A'}
+                                    <strong>Hash do Arquivo:</strong> ${block.data.fileHash.length < 70 ? block.data.fileHash : block.data.fileHash.substring(0, 67) + '...'}
                                 </div>
                             ` : ''}
                         </div>
