@@ -8,6 +8,9 @@ const { Blockchain } = require('./blockchain');
 const { Block } = require('./block');
 const viewRoutes = require('./routes/viewRoutes');
 const blockchainRoutes = require('./routes/blockchainRoutes');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 // App setup
 const app = express();

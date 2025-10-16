@@ -23,12 +23,13 @@ function viewRoutes(app) {
     app.post('/login', (req, res) => {
         const { username, password } = req.body;
         // TODO: substituir por validação real (BD, hash etc.)
-        if (username === 'admin' && password === 'senha') {
+        if (username === process.env.EMAIL_LOGIN && password === process.env.SENHA) {
             req.session.user = { username };
             return res.redirect('/');
         }
-        return res.redirect('/login?error=invalid');
-    });
+            return res.redirect('/login?error=invalid');
+
+    }); 
 
     app.post('/logout', (req, res) => {
         req.session.destroy(() => res.redirect('/login'));
