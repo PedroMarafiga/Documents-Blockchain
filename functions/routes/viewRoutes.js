@@ -27,7 +27,7 @@ function viewRoutes(app) {
             req.session.user = { username };
             return res.redirect('/');
         }
-        return res.status(401).send('Credenciais inválidas');
+        return res.redirect('/login?error=invalid');
     });
 
     app.post('/logout', (req, res) => {

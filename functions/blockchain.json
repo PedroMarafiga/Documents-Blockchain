@@ -9,5 +9,16 @@
     },
     "previousHash": "-",
     "hash": "fa96a36e55635ffe1d6fd49a657daa38dede19db91838b1c366b7ba679dfab2a"
+  },
+  {
+    "index": 1,
+    "timestamp": 1760617868208,
+    "data": {
+      "filename": "meuDocumento2.txt",
+      "storedAs": "1760617868199__meuDocumento2.txt",
+      "fileHash": "87f633634cc4b02f628685651f0a29b7bfa22a0bd841f725c6772dd00a58d489"
+    },
+    "previousHash": "fa96a36e55635ffe1d6fd49a657daa38dede19db91838b1c366b7ba679dfab2a",
+    "hash": "388d78c720f77892a1456c48170dd2920d0f3e9ab9660727d9e2ed7dd5c9e673"
   }
 ]

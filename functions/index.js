@@ -15,12 +15,12 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'templates')));
 
 app.use(session({
-  secret: 'teste',
+  secret: 'troque-por-uma-chave-secreta',
   resave: false,
   saveUninitialized: false,
+  cookie: { secure: false } // secure:true só em HTTPS
 }));
 
 // Garantir diretório de uploads
@@ -52,6 +52,9 @@ try {
     Block.indexCount = blockchain.chain.length;
   }
 } catch {}
+
+// SERVIR ARQUIVOS ESTÁTICOS (CSS/JS/IMAGENS) em /static
+app.use('/templates', express.static(path.join(__dirname, 'templates')));
 
 viewRoutes(app);
 // injeta dependências necessárias nas rotas da blockchain

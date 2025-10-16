@@ -1,0 +1,98 @@
+:root {
+    --bg-start: #eef2ff;
+    --bg-end: #ffffff;
+    --card-bg: #ffffff;
+    --accent: #4f46e5;
+    --muted: #6b7280;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(180deg, var(--bg-start), var(--bg-end));
+    color: #111827;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+/* Centraliza e estiliza o formulário direto na página */
+form {
+    width: 100%;
+    max-width: 420px;
+    background: var(--card-bg);
+    padding: 28px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(2,6,23,0.08);
+    border: 1px solid rgba(15,23,42,0.04);
+}
+
+/* Labels e inputs */
+label {
+    display: block;
+    font-size: 14px;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+input[type="text"],
+input[type="password"],
+input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #e6e9ef;
+    background: #fbfdff;
+    font-size: 14px;
+    color: #0f172a;
+    outline: none;
+    transition: box-shadow .15s, border-color .15s;
+    margin-bottom: 14px;
+}
+
+input:focus {
+    border-color: rgba(79,70,229,0.9);
+    box-shadow: 0 0 0 4px rgba(79,70,229,0.08);
+}
+
+/* Botão primário */
+button[type="submit"],
+button {
+    width: 100%;
+    padding: 12px 14px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background .12s, transform .06s;
+}
+
+button:hover { background: #4338ca; }
+button:active { transform: translateY(1px); }
+
+/* Texto secundário */
+small {
+    display: block;
+    margin-top: 12px;
+    color: var(--muted);
+    text-align: center;
+    font-size: 13px;
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+    form { padding: 20px; border-radius: 10px; }
+    input { padding: 10px; }
+}
