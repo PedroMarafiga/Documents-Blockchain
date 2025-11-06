@@ -58,4 +58,16 @@ async function addToFirestore(collection, data, docId = null, options = {}) {
   }
 }
 
-module.exports = { addToFirestore };
+async function getAllFromFirestore(collection) {
+  initFirebase();
+  const db = admin.firestore();
+  const snapshot = await db.collection(collection).get();
+  const results = [];
+
+  snapshot.forEach(doc => {
+    results.push(doc.data());
+  });
+  return results;
+}
+
+module.exports = { addToFirestore, getAllFromFirestore };

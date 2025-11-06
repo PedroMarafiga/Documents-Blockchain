@@ -1,16 +1,17 @@
 const path = require('path');
 const { sha256File } = require('../utils/sha256File');
 const { Block } = require('../block');
+const { firestore } = require('firebase-admin');
 
 // Factory que cria handlers do controller com dependências injetadas
 function buildBlockchainController({ blockchain }) {
   if (!blockchain) throw new Error('blockchain é obrigatório no controller');
 
-  const getBlockchain = (req, res) => {
+  const getBlockchain = async (req, res) => {
     return res.json({ chain: blockchain.chain });
   };
 
-  const addDocument = (req, res) => {
+  const addDocument = async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: 'Nenhum arquivo enviado.' });
@@ -27,7 +28,7 @@ function buildBlockchainController({ blockchain }) {
       };
 
       const newBlock = new Block(Date.now(), data);
-      blockchain.addBlock(newBlock);
+      await blockchain.addBlock(newBlock);
 
       return res.status(201).json({
         message: 'Documento adicionado à blockchain com sucesso.',

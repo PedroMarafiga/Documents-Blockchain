@@ -49,21 +49,34 @@ const upload = multer({ storage });
 // Blockchain instance
 const blockchain = new Blockchain();
 
-// Ajustar index do bloco para continuar a partir do tamanho atual da cadeia
-try {
-  if (Array.isArray(blockchain.chain)) {
-    Block.indexCount = blockchain.chain.length;
-  }
-} catch {}
+// Função assíncrona para inicializar o servidor
+async function startServer() {
+  // Inicializar blockchain (carregar do Firebase)
+  await blockchain.init();
+  
+  // Ajustar index do bloco para continuar a partir do tamanho atual da cadeia
+  try {
+    if (Array.isArray(blockchain.chain)) {
+      Block.indexCount = blockchain.chain.length;
+    }
+  } catch {}
 
-// SERVIR ARQUIVOS ESTÁTICOS (CSS/JS/IMAGENS) em /static
-app.use('/templates', express.static(path.join(__dirname, 'templates')));
+  // SERVIR ARQUIVOS ESTÁTICOS (CSS/JS/IMAGENS) em /static
+  app.use('/templates', express.static(path.join(__dirname, 'templates')));
 
-viewRoutes(app);
-// injeta dependências necessárias nas rotas da blockchain
-blockchainRoutes(app, { upload, blockchain });
+  viewRoutes(app);
+  // injeta dependências necessárias nas rotas da blockchain
+  blockchainRoutes(app, { upload, blockchain });
 
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta http://localhost:${PORT}/`);
+  app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta http://localhost:${PORT}/`);
+    console.log(`Blockchain inicializada com ${blockchain.chain.length} bloco(s)`);
+  });
+}
+
+// Iniciar servidor
+startServer().catch(err => {
+  console.error('Erro ao iniciar servidor:', err);
+  process.exit(1);
 });
 
