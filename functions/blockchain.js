@@ -1,4 +1,6 @@
 const { Block } = require('./block');
+const { addToFirestore } = require('./firebase');
+
 
 class Blockchain {
   constructor() {
@@ -40,9 +42,11 @@ class Blockchain {
   }
 
   addBlock(newBlock) {
+    
     const latest = this.getLatestBlock();
     newBlock.previousHash = latest.hash;
     newBlock.hash = newBlock.calculateHash();
+    addToFirestore('pendingBlocks', newBlock.getData(), newBlock.index.toString());
     this.chain.push(newBlock);
 
     // Salvar automaticamente

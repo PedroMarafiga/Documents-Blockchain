@@ -22,7 +22,8 @@ function buildBlockchainController({ blockchain }) {
       const data = {
         filename: req.file.originalname,
         storedAs: path.basename(filePath),
-        fileHash
+        fileHash,
+        owner: req.body.username || 'Desconhecido'
       };
 
       const newBlock = new Block(Date.now(), data);

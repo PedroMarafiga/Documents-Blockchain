@@ -9,6 +9,10 @@ class Block {
     this.hash = this.calculateHash();
   }
 
+  getData() {
+    return {index: this.index, timestamp: this.timestamp,data: this.data, previousHash: this.previousHash, hash: this.hash};
+  }
+
   calculateHash() {
     const crypto = require('crypto');
     return crypto
