@@ -1,16 +1,17 @@
 class Block {
-  static indexCount = 0;
+
 
   constructor(timestamp, data, previousHash = '') {
-    this.index = Block.indexCount++;
+
     this.timestamp = timestamp;
     this.data = data;  
     this.previousHash = previousHash;
     this.hash = this.calculateHash();
+    this.nounce = 0;
   }
 
   getData() {
-    return {index: this.index, timestamp: this.timestamp,data: this.data, previousHash: this.previousHash, hash: this.hash};
+    return {timestamp: this.timestamp,data: this.data, previousHash: this.previousHash, hash: this.hash, nounce: this.nounce };
   }
 
   calculateHash() {
