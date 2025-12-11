@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Documents Blockchain</title>
     <link rel="stylesheet" href="/styles.css">
+    <script type="module">
+        import { auth } from '/firebase-config.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js';
+        
+        // Verificar se usuário está autenticado
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                // Não autenticado, redirecionar para login
+                window.location.href = '/';
+            }
+        });
+    </script>
 </head>
 <body>
     <div class="container">
