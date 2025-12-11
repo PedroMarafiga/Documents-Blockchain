@@ -45,7 +45,6 @@ class Blockchain {
     const latest = this.getLatestBlock();
     newBlock.previousHash = latest.hash;
     newBlock.hash = newBlock.calculateHash();
-    newBlock.nounce = 0;
     const timestamp = this.formatTimestamp(newBlock.timestamp);
     await addToFirestore('pendingBlocks', newBlock.getData(), timestamp);
     this.chain.push(newBlock);

@@ -7,11 +7,10 @@ class Block {
     this.data = data;  
     this.previousHash = previousHash;
     this.hash = this.calculateHash();
-    this.nounce = 0;
   }
 
   getData() {
-    return {timestamp: this.timestamp,data: this.data, previousHash: this.previousHash, hash: this.hash, nounce: this.nounce };
+    return {timestamp: this.timestamp,data: this.data, previousHash: this.previousHash, hash: this.hash};
   }
 
   calculateHash() {

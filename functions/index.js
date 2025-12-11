@@ -65,7 +65,7 @@ async function startServer() {
   } catch {}
 
   // SERVIR ARQUIVOS ESTÁTICOS (CSS/JS/IMAGENS) em /static
-  app.use('/templates', express.static(path.join(__dirname, 'templates')));
+  app.use('/public', express.static(path.join(__dirname, 'public')));
 
   viewRoutes(app);
   // injeta dependências necessárias nas rotas da blockchain

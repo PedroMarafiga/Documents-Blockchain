@@ -1,0 +1,24 @@
+name: Deploy Firebase
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Criar serviceAccountKey.json
+        run: echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_DOCUMENTS_BLOCKCHAIN }}' > serviceAccountKey.json
+
+      - name: Instalar Firebase Tools
+        run: npm install -g firebase-tools
+
+      - name: Autenticar com Service Account
+        run: |
+          export GOOGLE_APPLICATION_CREDENTIALS="$GITHUB_WORKSPACE/serviceAccountKey.json"
+          firebase deploy --only hosting --project documents-blockchain

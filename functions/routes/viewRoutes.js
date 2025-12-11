@@ -8,11 +8,11 @@ function viewRoutes(app) {
         if (!req.session || !req.session.user) {
             return res.redirect('/login');
         }
-        res.sendFile(path.join(__dirname, '..', 'templates', 'blockchain.html'));
+        res.sendFile(path.join(__dirname, '..', 'public', 'blockchain.html'));
     });
 
     app.get('/login', (req, res) => {
-        res.sendFile(path.join(__dirname, '..', 'templates', 'login.html'));
+        res.sendFile(path.join(__dirname, '..', 'public', 'login.html'));
     });
 
     // processa submissão do login
