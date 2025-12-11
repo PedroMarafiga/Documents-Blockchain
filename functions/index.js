@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const express = require('express');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 const multer = require('multer');
 const { Blockchain } = require('./blockchain');
 const { Block } = require('./block');
@@ -17,6 +18,12 @@ dotenv.config();
 // App setup
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Configurar CORS para permitir requisições do Firebase Hosting
+app.use(cors({
+  origin: '*', // Permitir todas as origens (ou especifique seu domínio do Firebase)
+  credentials: true
+}));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -64,8 +71,8 @@ async function startServer() {
     }
   } catch {}
 
-  // SERVIR ARQUIVOS ESTÁTICOS (CSS/JS/IMAGENS) em /static
-  app.use('/public', express.static(path.join(__dirname, 'public')));
+  // SERVIR ARQUIVOS ESTÁTICOS (CSS/JS/IMAGENS)
+  app.use(express.static(path.join(__dirname, 'public')));
 
   viewRoutes(app);
   // injeta dependências necessárias nas rotas da blockchain

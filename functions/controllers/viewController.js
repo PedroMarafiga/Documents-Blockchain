@@ -8,8 +8,8 @@ function homeController(req, res) {
         if (!req.session || !req.session.user) {
             return res.redirect('/login');
         }
-        // Envia o arquivo public/index.html
-        res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+        // Envia o arquivo public/home.html
+        res.sendFile(path.join(__dirname, '..', 'public', 'home.html'));
     } catch (error) {
         console.error('Erro ao renderizar HTML:', error);
         res.status(500).send('Erro interno do servidor');
