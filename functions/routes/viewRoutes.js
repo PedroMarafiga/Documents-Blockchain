@@ -4,6 +4,13 @@ const { homeController, loginController } = require('../controllers/viewControll
 function viewRoutes(app) {
     app.get('/', homeController);
 
+    app.get('/blockchain', (req, res) => {
+        if (!req.session || !req.session.user) {
+            return res.redirect('/login');
+        }
+        res.sendFile(path.join(__dirname, '..', 'templates', 'blockchain.html'));
+    });
+
     app.get('/login', (req, res) => {
         res.sendFile(path.join(__dirname, '..', 'templates', 'login.html'));
     });

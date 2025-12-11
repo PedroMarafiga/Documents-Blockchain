@@ -2,6 +2,7 @@ const path = require('path');
 const { sha256File } = require('../utils/sha256File');
 const { Block } = require('../block');
 const { firestore } = require('firebase-admin');
+const { getAllFromFirestore } = require('../firebase');
 
 // Factory que cria handlers do controller com dependências injetadas
 function buildBlockchainController({ blockchain }) {
@@ -9,6 +10,16 @@ function buildBlockchainController({ blockchain }) {
 
   const getBlockchain = async (req, res) => {
     return res.json({ chain: blockchain.chain });
+  };
+
+  const getMinedBlockchain = async (req, res) => {
+    try {
+      const minedBlocks = await getAllFromFirestore('chain');
+      return res.json({ chain: minedBlocks });
+    } catch (error) {
+      console.error('Erro ao buscar blockchain minerada:', error);
+      return res.status(500).json({ message: 'Erro ao buscar blockchain minerada.' });
+    }
   };
 
   const addDocument = async (req, res) => {
@@ -24,7 +35,7 @@ function buildBlockchainController({ blockchain }) {
         filename: req.file.originalname,
         storedAs: path.basename(filePath),
         fileHash,
-        owner: req.body.username || 'Desconhecido'
+        owner: req.session?.user?.username || req.cookies?.username || 'Desconhecido'
       };
 
       const newBlock = new Block(Date.now(), data);
@@ -46,7 +57,7 @@ function buildBlockchainController({ blockchain }) {
     }
   };
 
-  return { getBlockchain, addDocument };
+  return { getBlockchain, addDocument, getMinedBlockchain };
 }
 
 module.exports = { buildBlockchainController };

@@ -34,6 +34,28 @@ header p {
     opacity: 0.9;
 }
 
+.header-buttons {
+    margin-top: 15px;
+}
+
+.view-blockchain-btn {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: all 0.3s;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.view-blockchain-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
 main {
     display: grid;
     gap: 30px;

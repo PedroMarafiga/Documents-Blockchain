@@ -3,12 +3,14 @@ const path = require('path');
 const crypto = require('crypto');
 const express = require('express');
 const session = require('express-session');
+const cookieParser = require('cookie-parser');
 const multer = require('multer');
 const { Blockchain } = require('./blockchain');
 const { Block } = require('./block');
 const viewRoutes = require('./routes/viewRoutes');
 const blockchainRoutes = require('./routes/blockchainRoutes');
 const dotenv = require('dotenv');
+const admin = require('firebase-admin');
 
 dotenv.config();
 
@@ -18,6 +20,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
 
 app.use(session({
   secret: 'troque-por-uma-chave-secreta',

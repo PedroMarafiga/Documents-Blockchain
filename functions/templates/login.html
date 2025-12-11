@@ -9,19 +9,83 @@
 </head>
 
 <body>
-  <form method="POST" action="/login">
+  <form id="loginForm">
     <div id="error-message" style="color: red; margin-bottom: 10px;"></div>
+    <div id="loading-message" style="color: blue; margin-bottom: 10px; display: none;">Autenticando...</div>
 
-    <label>Usuário: <input name="username" required></label><br>
-    <label>Senha: <input name="password" type="password" required></label><br>
+    <label>Email: <input id="email" name="email" type="email" required></label><br>
+    <label>Senha: <input id="password" name="password" type="password" required></label><br>
     
     <button type="submit">Entrar</button>
     
   </form>
-  <script>
+
+  <script type="module">
+    import { auth } from '/templates/firebase-config.js';
+    import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const loginForm = document.getElementById('loginForm');
+    const errorMessage = document.getElementById('error-message');
+    const loadingMessage = document.getElementById('loading-message');
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      errorMessage.textContent = '';
+      loadingMessage.style.display = 'block';
+
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        
+        // Obter o token de autenticação
+        const idToken = await user.getIdToken();
+        
+        // Enviar o token para o backend
+        const response = await fetch('/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            idToken: idToken,
+            email: user.email
+          })
+        });
+
+        if (response.ok) {
+          window.location.href = '/';
+        } else {
+          const data = await response.json();
+          errorMessage.textContent = data.message || 'Erro ao fazer login';
+          loadingMessage.style.display = 'none';
+        }
+        
+      } catch (error) {
+        loadingMessage.style.display = 'none';
+        
+        if (error.code === "auth/user-not-found") {
+          errorMessage.textContent = "Email não cadastrado.";
+        } else if (error.code === "auth/wrong-password" || error.code === "auth/invalid-credential") {
+          errorMessage.textContent = "Senha incorreta.";
+        } else if (error.code === "auth/invalid-email") {
+          errorMessage.textContent = "Email inválido.";
+        } else if (error.code === "auth/too-many-requests") {
+          errorMessage.textContent = "Muitas tentativas. Tente novamente mais tarde.";
+        } else {
+          errorMessage.textContent = `Erro: ${error.message}`;
+        }
+        console.error('Erro no login:', error);
+      }
+    });
+
+    // Verificar se há erro na URL (para compatibilidade)
     const params = new URLSearchParams(window.location.search);
     if (params.get('error') === 'invalid') {
-      document.getElementById('error-message').textContent = 'Usuário ou senha inválidos';
+      errorMessage.textContent = 'Usuário ou senha inválidos';
     }
   </script>
 </body>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Completa - Documents Blockchain</title>
+    <link rel="stylesheet" href="/templates/styles.css">
+    <style>
+        .blockchain-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+        }
+
+        .blockchain-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            color: white;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .mined-block {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .mined-block:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .block-header-full {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .block-index-large {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .block-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-mined {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .block-detail {
+            margin-bottom: 1rem;
+        }
+
+        .block-detail-label {
+            font-weight: 600;
+            color: #495057;
+            display: block;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .block-detail-value {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #212529;
+            word-break: break-all;
+            background: #f8f9fa;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+
+        .miner-badge {
+            display: inline-block;
+            background: #ffc107;
+            color: #000;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-blocks {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+        .filter-section {
+            margin-bottom: 2rem;
+        }
+
+        .filter-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="blockchain-header">
+            <div>
+                <h1>Blockchain Completa</h1>
+                <p>Todos os blocos minerados da rede</p>
+            </div>
+            <a href="/" class="back-btn">← Voltar</a>
+        </header>
+
+        <section class="blockchain-stats">
+            <div class="stat-card">
+                <div class="stat-label">Total de Blocos</div>
+                <div class="stat-value" id="totalBlocks">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Blocos Minerados</div>
+                <div class="stat-value" id="minedBlocks">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Último Bloco</div>
+                <div class="stat-value" id="lastBlockTime">-</div>
+            </div>
+        </section>
+
+        <section class="filter-section">
+            <input type="text" id="searchInput" class="filter-input" placeholder="🔍 Buscar por hash, arquivo, minerador...">
+        </section>
+
+        <section id="blocksContainer">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Carregando blockchain...</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        class BlockchainViewer {
+            constructor() {
+                this.blocks = [];
+                this.filteredBlocks = [];
+                this.initializeElements();
+                this.attachEventListeners();
+                this.loadBlockchain();
+            }
+
+            initializeElements() {
+                this.totalBlocksEl = document.getElementById('totalBlocks');
+                this.minedBlocksEl = document.getElementById('minedBlocks');
+                this.lastBlockTimeEl = document.getElementById('lastBlockTime');
+                this.blocksContainer = document.getElementById('blocksContainer');
+                this.searchInput = document.getElementById('searchInput');
+            }
+
+            attachEventListeners() {
+                this.searchInput.addEventListener('input', (e) => this.filterBlocks(e.target.value));
+            }
+
+            async loadBlockchain() {
+                try {
+                    const response = await fetch('/api/chain');
+                    const data = await response.json();
+                    
+                    this.blocks = data.chain || [];
+                    this.filteredBlocks = [...this.blocks];
+                    
+                    this.updateStats();
+                    this.renderBlocks();
+                } catch (error) {
+                    console.error('Erro ao carregar blockchain:', error);
+                    this.blocksContainer.innerHTML = `
+                        <div class="no-blocks">
+                            <h3>Erro ao carregar blockchain</h3>
+                            <p>${error.message}</p>
+                        </div>
+                    `;
+                }
+            }
+
+            updateStats() {
+                this.totalBlocksEl.textContent = this.blocks.length;
+                this.minedBlocksEl.textContent = this.blocks.filter(b => b.blockHash).length;
+                
+                if (this.blocks.length > 0) {
+                    const lastBlock = this.blocks[this.blocks.length - 1];
+                    const date = new Date(lastBlock.timestamp);
+                    this.lastBlockTimeEl.textContent = date.toLocaleTimeString('pt-BR', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    });
+                }
+            }
+
+            filterBlocks(searchTerm) {
+                const term = searchTerm.toLowerCase().trim();
+                
+                if (!term) {
+                    this.filteredBlocks = [...this.blocks];
+                } else {
+                    this.filteredBlocks = this.blocks.filter(block => {
+                        const searchableText = JSON.stringify(block).toLowerCase();
+                        return searchableText.includes(term);
+                    });
+                }
+                
+                this.renderBlocks();
+            }
+
+            renderBlocks() {
+                if (this.filteredBlocks.length === 0) {
+                    this.blocksContainer.innerHTML = `
+                        <div class="no-blocks">
+                            <h3>Nenhum bloco encontrado</h3>
+                            <p>Tente ajustar os filtros de busca</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                this.blocksContainer.innerHTML = this.filteredBlocks.map((block, index) => `
+                    <div class="mined-block">
+                        <div class="block-header-full">
+                            <span class="block-index-large">Bloco #${block.index || index}</span>
+                            <div>
+                                ${block.blockHash ? '<span class="block-status status-mined">✓ Minerado</span>' : ''}
+                                ${block.miner ? `<span class="miner-badge">⛏️ ${block.miner}</span>` : ''}
+                            </div>
+                        </div>
+
+                        <div class="block-detail">
+                            <span class="block-detail-label">Timestamp</span>
+                            <span class="block-detail-value">${new Date(block.timestamp).toLocaleString('pt-BR')}</span>
+                        </div>
+
+                        ${block.blockHash ? `
+                            <div class="block-detail">
+                                <span class="block-detail-label">Hash do Bloco</span>
+                                <span class="block-detail-value">${block.blockHash}</span>
+                            </div>
+                        ` : ''}
+
+                        <div class="block-detail">
+                            <span class="block-detail-label">Hash Anterior</span>
+                            <span class="block-detail-value">${block.previousHash}</span>
+                        </div>
+
+                        ${block.data && block.data.filename ? `
+                            <div class="block-detail">
+                                <span class="block-detail-label">📄 Documento</span>
+                                <span class="block-detail-value">${block.data.filename}</span>
+                            </div>
+                        ` : ''}
+
+                        ${block.data && block.data.fileHash ? `
+                            <div class="block-detail">
+                                <span class="block-detail-label">Hash do Arquivo</span>
+                                <span class="block-detail-value">${block.data.fileHash}</span>
+                            </div>
+                        ` : ''}
+
+                        ${block.data && block.data.owner ? `
+                            <div class="block-detail">
+                                <span class="block-detail-label">👤 Proprietário</span>
+                                <span class="block-detail-value">${block.data.owner}</span>
+                            </div>
+                        ` : ''}
+
+                        ${block.data && block.data.fileUrl ? `
+                            <div class="block-detail">
+                                <span class="block-detail-label">🔗 URL do Arquivo</span>
+                                <span class="block-detail-value"><a href="${block.data.fileUrl}" target="_blank">Visualizar Arquivo</a></span>
+                            </div>
+                        ` : ''}
+
+                        ${block.nonce ? `
+                            <div class="block-detail">
+                                <span class="block-detail-label">Nonce</span>
+                                <span class="block-detail-value">${block.nonce}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new BlockchainViewer();
+        });
+    </script>
+</body>
+</html>
