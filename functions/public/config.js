@@ -1,7 +1,7 @@
 // Configuração da API
 const API_CONFIG = {
     // URL do ngrok - Troque aqui quando o ngrok gerar uma nova URL
-    NGROK_URL: 'https://eea6d144460d.ngrok-free.app',
+    NGROK_URL: 'https://0214541622f5.ngrok-free.app',
     
     // Detecta automaticamente se está rodando localmente
     isLocal() {

@@ -21,8 +21,8 @@ const db = admin.firestore();
 // ------------------------
 // Configuração
 // ------------------------
-const DIFFICULTY = 5; // dificulade da mineração
-const minerId = process.argv[2] || "miner";  // identifica o minerador
+const DIFFICULTY = 6; 
+const minerId = process.argv[2] || "miner";
 
 // ------------------------
 // Funções utilitárias
@@ -44,7 +44,7 @@ async function mineBlock(docId, data) {
     let nonce = 0;
     let hash;
 
-    console.log(`⛏️  ${minerId}: Iniciando mineração do bloco ${docId}...`);
+    console.log(` ${minerId}: Iniciando mineração do bloco ${docId}...`);
 
     do {
         nonce++;
@@ -52,7 +52,7 @@ async function mineBlock(docId, data) {
         hash = sha256(toHash);
     } while (!isValid(hash));
 
-    console.log(`🎉 ${minerId} encontrou o hash válido: ${hash}`);
+    console.log(`${minerId} encontrou o hash válido: ${hash}`);
 
     return {
         ...data,
@@ -66,7 +66,7 @@ async function mineBlock(docId, data) {
 // Loop contínuo do minerador
 // ------------------------
 async function runMiner() {
-    console.log(`🚀 Minerador ${minerId} iniciado...`);
+    console.log(`Minerador ${minerId} iniciado...`);
 
     while (true) {
         const snapshot = await db.collection('pendingBlocks')
@@ -89,19 +89,19 @@ async function runMiner() {
         try {
             // Atualiza a blockchain
             await db.collection('chain').doc(doc.id).set(mined);
-            console.log(`🟢 ${minerId}: Bloco salvo na coleção 'chain'`);
+            console.log(`${minerId}: Bloco salvo na coleção 'chain'`);
 
             // Log opcional
             await db.collection('minedBlocks').doc(doc.id).set(mined);
-            console.log(`🟢 ${minerId}: Log salvo em 'minedBlocks'`);
+            console.log(`${minerId}: Log salvo em 'minedBlocks'`);
 
             // Remove da fila pendente
             await db.collection('pendingBlocks').doc(doc.id).delete();
-            console.log(`🗑️ ${minerId}: Bloco removido de 'pendingBlocks'`);
+            console.log(`${minerId}: Bloco removido de 'pendingBlocks'`);
 
-            console.log(`🏁 ${minerId}: Bloco ${doc.id} minerado com sucesso!`);
+            console.log(`${minerId}: Bloco ${doc.id} minerado com sucesso!`);
         } catch (error) {
-            console.error(`❌ ${minerId}: Erro ao finalizar bloco ${doc.id}:`, error);
+            console.error(`${minerId}: Erro ao finalizar bloco ${doc.id}:`, error);
         }
     }
 }

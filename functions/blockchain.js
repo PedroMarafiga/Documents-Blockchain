@@ -38,7 +38,6 @@ class Blockchain {
   }
 
   async addBlock(newBlock) {
-    // Garante que a cadeia está carregada
     if (this.chain.length === 0) {
       await this.init();
     }
@@ -49,7 +48,6 @@ class Blockchain {
     await addToFirestore('pendingBlocks', newBlock.getData(), timestamp);
     this.chain.push(newBlock);
 
-    // Atualiza a chain local após adicionar no Firestore
     await this.init();
   }
 

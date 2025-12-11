@@ -21,9 +21,24 @@ const PORT = process.env.PORT || 3000;
 
 // Configurar CORS para permitir requisições do Firebase Hosting
 app.use(cors({
-  origin: '*', // Permitir todas as origens (ou especifique seu domínio do Firebase)
-  credentials: true
+  origin: ['https://documents-blockchain.web.app', 'https://documents-blockchain.firebaseapp.com', 'http://localhost:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning']
 }));
+
+// Middleware para adicionar cabeçalhos CORS manualmente (para garantir)
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, ngrok-skip-browser-warning');
+  
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
