@@ -3,6 +3,7 @@ const { sha256File } = require('../utils/sha256File');
 const { Block } = require('../block');
 const { firestore } = require('firebase-admin');
 const { getAllFromFirestore } = require('../firebase');
+const { uploadToSupabase } = require('../utils/uploadToSupabase');
 
 // Factory que cria handlers do controller com dependências injetadas
 function buildBlockchainController({ blockchain }) {
@@ -31,11 +32,25 @@ function buildBlockchainController({ blockchain }) {
       const filePath = req.file.path;
       const fileHash = sha256File(filePath);
 
+      // Upload para o Supabase Storage
+      let storageData = null;
+      try {
+        storageData = await uploadToSupabase(filePath, req.file.originalname);
+        console.log('📁 Arquivo salvo no Supabase Storage:', storageData.filename);
+      } catch (storageError) {
+        console.warn('⚠️ Erro ao fazer upload para o Supabase, continuando sem ele:', storageError.message);
+      }
+
       const data = {
         filename: req.file.originalname,
         storedAs: path.basename(filePath),
         fileHash,
-        owner: req.session?.user?.username || req.cookies?.username || 'Desconhecido'
+        owner: req.session?.user?.username || req.cookies?.username || 'Desconhecido',
+        ...(storageData && {
+          storageFilename: storageData.filename,
+          storageUrl: storageData.url,
+          storagePath: storageData.path
+        })
       };
 
       const newBlock = new Block(Date.now(), data);
