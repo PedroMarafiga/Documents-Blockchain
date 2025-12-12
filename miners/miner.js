@@ -21,7 +21,7 @@ const db = admin.firestore();
 // ------------------------
 // Configuração
 // ------------------------
-const DIFFICULTY = 6; 
+const DIFFICULTY = 5; 
 const minerId = process.argv[2] || "miner";
 
 // ------------------------
